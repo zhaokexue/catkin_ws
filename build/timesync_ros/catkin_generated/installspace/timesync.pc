@@ -1,0 +1,8 @@
+prefix=/home/kenan/catkin_ws/install
+
+Name: timesync
+Description: Description of timesync
+Version: 1.0.0
+Cflags: -I/home/kenan/catkin_ws/install/include
+Libs: -L/home/kenan/catkin_ws/install/lib -ltimesync
+Requires: dynamic_reconfigure roscpp message_runtime

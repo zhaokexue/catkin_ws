@@ -1,0 +1,7 @@
+<launch>
+    <node pkg="mbot_apps" type="mbot_exploring.py" respawn="false" name="mbot_exploring" output="screen">
+        <param name="goalListX" value="17.8, 19.8,17.8,13.8" />
+        <param name="goalListY" value="13.8, 16.8,13.8,13.8" />
+        <param name="goalListYaw" value="0.0, 90.0,0.0,0.0 " /><!--degree--> 
+    </node>
+</launch>

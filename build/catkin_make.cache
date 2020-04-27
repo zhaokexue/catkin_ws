@@ -1,0 +1,2 @@
+driver_common/driver_base:driver_common/driver_common:driver_common/timestamp_tools:hokuyo_node:lpms_imu:mbot_apps:mbot_bringup:mbot_description:mbot_laserUndistortion:mbot_navigation:mbot_teleop:robot_pose_ekf:timesync_ros
+-DCATKIN_DEVEL_PREFIX=/home/kenan/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kenan/catkin_ws/install -G Unix Makefiles

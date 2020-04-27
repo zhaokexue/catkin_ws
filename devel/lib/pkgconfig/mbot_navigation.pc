@@ -1,0 +1,8 @@
+prefix=/home/kenan/catkin_ws/devel
+
+Name: mbot_navigation
+Description: Description of mbot_navigation
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kenan/catkin_ws/devel/lib 
+Requires: 

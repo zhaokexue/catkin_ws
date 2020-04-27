@@ -1,0 +1,8 @@
+prefix=/home/kenan/catkin_ws/install
+
+Name: mbot_laserUndistortion
+Description: Description of mbot_laserUndistortion
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kenan/catkin_ws/install/lib 
+Requires: 

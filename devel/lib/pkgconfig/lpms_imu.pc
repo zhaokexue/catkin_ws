@@ -1,0 +1,8 @@
+prefix=/home/kenan/catkin_ws/devel
+
+Name: lpms_imu
+Description: Description of lpms_imu
+Version: 0.1.0
+Cflags: 
+Libs: -L/home/kenan/catkin_ws/devel/lib 
+Requires: timesync
