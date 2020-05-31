@@ -1,0 +1,4 @@
+<launch>
+   <node name="mbot_laserUndistortion_Node" pkg="mbot_laserUndistortion"  type="mbot_laserUndistortion_node" output="screen" />
+</launch>
+

@@ -1,0 +1,275 @@
+<?xml version="1.0"?>
+<robot name="mbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- PROPERTY LIST -->
+    <xacro:property name="M_PI" value="3.1415926"/>
+
+    <xacro:property name="base_mass"   value="5" /> 
+    <xacro:property name="base_radius" value="0.075"/>
+    <xacro:property name="base_length" value="0.104"/>
+
+    <xacro:property name="base_motor_mass" value="1" /> 
+    <xacro:property name="base_motor_x" value="0.030"/>
+    <xacro:property name="base_motor_y" value="0.157"/>
+    <xacro:property name="base_motor_z" value="0.030"/> 
+
+    <xacro:property name="wheel_mass"   value="0.2" />
+    <xacro:property name="wheel_radius" value="0.032"/>
+    <xacro:property name="wheel_length" value="0.026"/>
+
+    <xacro:property name="wheel_joint_x" value="0.0000"/>
+    <xacro:property name="wheel_joint_y" value="0.0785"/>
+    <xacro:property name="wheel_joint_z" value="0.0850"/>
+
+    <xacro:property name="caster_box_mass" value="0.1" /> 
+    <xacro:property name="caster_box_x" value="0.04"/>
+    <xacro:property name="caster_box_y" value="0.04"/>
+    <xacro:property name="caster_box_z" value="0.04"/>
+
+    <xacro:property name="caster_box_joint_x" value="0.055"/>
+
+    <xacro:property name="caster_mass"    value="0.1" /> 
+    <xacro:property name="caster_radius" value="0.0125"/> <!-- can't use chinese char 0.5mm wheel_radius - ( base_length/2 - wheel_joint_z) -->
+                                                            
+    <xacro:property name="caster_joint_x" value="0.055"/>
+
+    <!-- Defining the colors used in this robot -->
+    <material name="yellow">
+        <color rgba="1 0.4 0 1"/>
+    </material>
+    <material name="black">
+        <color rgba="0 0 0 0.95"/>
+    </material>
+    <material name="gray">
+        <color rgba="0.75 0.75 0.75 1"/>
+    </material>
+    
+    <!-- Macro for inertia matrix -->
+    <xacro:macro name="sphere_inertial_matrix" params="m r">
+        <inertial>
+            <mass value="${m}" />
+            <inertia ixx="${2*m*r*r/5}" ixy="0" ixz="0"
+                iyy="${2*m*r*r/5}" iyz="0" 
+                izz="${2*m*r*r/5}" />
+        </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="box_inertial_matrix" params="m a b c">
+        <inertial>
+            <mass value="${m}" />
+            <inertia ixx="${m*(b*b+c*c)/12}" ixy = "0" ixz = "0"
+                iyy="${m*(c*c+a*a)/12}" iyz = "0"
+                izz="${m*(a*a+b*b)/12}" />
+            </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="cylinder_inertial_matrix" params="m r h">
+        <inertial>
+            <mass value="${m}" />
+            <inertia ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0"
+                iyy="${m*(3*r*r+h*h)/12}" iyz = "0"
+                izz="${m*r*r/2}" /> 
+        </inertial>
+    </xacro:macro>
+
+    <!-- Macro for robot wheel -->
+    <xacro:macro name="wheel" params="prefix reflect">
+        <joint name="${prefix}_wheel_joint" type="continuous">
+            <origin xyz="${-wheel_joint_x} ${reflect*wheel_joint_y} ${-wheel_joint_z}" rpy="0 0 0"/>
+            <parent link="base_link"/>
+            <child link="${prefix}_wheel_link"/>
+            <axis xyz="0 1 0"/>
+        </joint>
+
+        <link name="${prefix}_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length = "${wheel_length}"/>
+                </geometry>
+                <material name="gray" />
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length = "${wheel_length}"/>
+                </geometry>
+            </collision>
+            <cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_length}" />
+        </link>
+
+        <gazebo reference="${prefix}_wheel_link">
+            <material>Gazebo/Gray</material>
+        </gazebo>
+
+        <!-- Transmission is important to link the joints and the controller -->
+        <transmission name="${prefix}_wheel_joint_trans">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="${prefix}_wheel_joint" >
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="${prefix}_wheel_joint_motor">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+        </transmission>
+    </xacro:macro>
+
+    <!-- Macro for robot caster box -->
+    <xacro:macro name="caster_box" params="prefix reflect">
+        <joint name="${prefix}_caster_box_joint" type="fixed">
+            <origin xyz="${reflect*caster_box_joint_x} 0 ${-(base_length/2 + caster_box_z/2)}" rpy="0 0 0"/>
+            <parent link="base_link"/>
+            <child link="${prefix}_caster_box_link"/>
+        </joint>
+
+        <link name="${prefix}_caster_box_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                     <box size="${caster_box_x} ${caster_box_y} ${caster_box_z}" />
+                </geometry>
+                <material name="yellow" />
+            </visual>
+            <collision>
+                <origin xyz=" 0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${caster_box_x} ${caster_box_y} ${caster_box_z}" />
+                </geometry>
+            </collision>  
+            <box_inertial_matrix  m="${caster_box_mass}" a="${caster_box_x}" b="${caster_box_y}" c="${caster_box_z}" />
+        </link>
+        <gazebo reference="${prefix}_caster_box_link">
+            <material>Gazebo/Blue</material>
+        </gazebo>
+    </xacro:macro>
+
+    <!-- Macro for robot caster -->
+    <xacro:macro name="caster" params="prefix reflect">
+        <joint name="${prefix}_caster_joint" type="continuous">
+            <origin xyz="${reflect*caster_joint_x} 0 ${-(base_length/2 + caster_box_z + caster_radius)}" rpy="0 0 0"/>
+            <parent link="base_link"/>
+            <child link="${prefix}_caster_link"/>
+            <axis xyz="0 1 0"/>
+        </joint>
+
+        <link name="${prefix}_caster_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <sphere radius="${caster_radius}" />
+                </geometry>
+                <material name="black" />
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <sphere radius="${caster_radius}" />
+                </geometry>
+            </collision>      
+            <sphere_inertial_matrix  m="${caster_mass}" r="${caster_radius}" />
+        </link>
+        <gazebo reference="${prefix}_caster_link">
+            <material>Gazebo/Black</material>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:macro name="mbot_base_gazebo">
+        <link name="base_footprint">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.001 0.001 0.001" />
+                </geometry>
+            </visual>
+        </link>
+        <gazebo reference="base_footprint">
+            <turnGravityOff>false</turnGravityOff>
+        </gazebo>
+
+        <joint name="base_footprint_joint" type="fixed">
+            <origin xyz="0 0 ${base_length/2 + caster_box_z + caster_radius*2}" rpy="0 0 0" />        
+            <parent link="base_footprint"/>
+            <child link="base_link" />
+        </joint>
+        <link name="base_link">
+            <visual>
+                <origin xyz=" 0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder radius="${base_radius}" length = "${base_length}"/>
+                </geometry>
+                <material name="yellow" />
+            </visual>
+            <collision>
+                <origin xyz=" 0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder radius="${base_radius}" length = "${base_length}"/>
+                </geometry>
+            </collision>   
+             <cylinder_inertial_matrix  m="${base_mass}" r="${base_radius}" h="${base_length}" />
+        </link>
+        <gazebo reference="base_link">
+            <material>Gazebo/Blue</material>
+        </gazebo>
+
+        <joint name="base_motor_joint" type="fixed">
+            <origin xyz="0 0 -${base_length/2 + base_motor_z/2 }" rpy="0 0 0" />        
+            <parent link="base_link"/>
+            <child link="base_motor_link" />
+        </joint>
+        <link name="base_motor_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${base_motor_x} ${base_motor_y} ${base_motor_z}" />
+                </geometry>
+                <material name="yellow" />
+            </visual>
+            <collision>
+                <origin xyz=" 0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${base_motor_x} ${base_motor_y} ${base_motor_z}" />
+                </geometry>
+            </collision>  
+            <box_inertial_matrix  m="${base_motor_mass}" a="${base_motor_x}" b="${base_motor_y}" c="${base_motor_z}" />
+        </link>   
+        <gazebo reference="base_motor_link">
+            <material>Gazebo/Blue</material>
+        </gazebo>     
+
+        <wheel prefix="left"  reflect="-1"/>
+        <wheel prefix="right" reflect="1"/>
+
+        <caster_box prefix="front" reflect="1"/>
+        <caster_box prefix="back" reflect="-1"/>
+
+	    <caster prefix="front" reflect="1"/>
+        <caster prefix="back"  reflect="-1"/>
+
+        <!-- controller -->
+        <gazebo>
+            <plugin name="differential_drive_controller" 
+                    filename="libgazebo_ros_diff_drive.so">
+                <rosDebugLevel>Debug</rosDebugLevel>
+                <publishWheelTF>true</publishWheelTF>
+                <robotNamespace>/</robotNamespace>
+                <publishTf>1</publishTf>
+                <publishWheelJointState>true</publishWheelJointState>
+                <alwaysOn>true</alwaysOn>
+                <updateRate>100.0</updateRate>
+                <legacyMode>true</legacyMode>
+                <leftJoint>left_wheel_joint</leftJoint>
+                <rightJoint>right_wheel_joint</rightJoint>
+                <wheelSeparation>${wheel_joint_y*2}</wheelSeparation>
+                <wheelDiameter>${2*wheel_radius}</wheelDiameter>
+                <broadcastTF>1</broadcastTF>
+                <wheelTorque>30</wheelTorque>
+                <wheelAcceleration>1.8</wheelAcceleration>
+                <commandTopic>cmd_vel</commandTopic>
+                <odometryFrame>odom</odometryFrame> 
+                <odometryTopic>odom</odometryTopic> 
+                <robotBaseFrame>base_footprint</robotBaseFrame>
+            </plugin>
+        </gazebo> 
+    </xacro:macro>
+</robot>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<robot name="arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find mbot_description)/urdf/xacro/mbot_base.xacro" />
+    <xacro:include filename="$(find mbot_description)/urdf/xacro/sensors/lidar.xacro" />
+    <xacro:include filename="$(find mbot_description)/urdf/xacro/sensors/imu.xacro" />
+
+    <xacro:property name="laser_offset_x" value="0.0" />
+    <xacro:property name="laser_offset_y" value="0.0" />
+    <xacro:property name="laser_offset_z" value="0.082" />
+
+    <xacro:property name="imu_offset_x" value="-0.035" />
+    <xacro:property name="imu_offset_y" value="0.0" />
+    <xacro:property name="imu_offset_z" value="0.055" />
+
+    <mbot_base/>
+
+    <!-- laser -->
+    <joint name="laser_joint" type="fixed">
+        <origin xyz="${laser_offset_x} ${laser_offset_y} ${laser_offset_z}" rpy="0 0 0" />
+        <parent link="base_link"/>
+        <child link="laser_link"/>
+    </joint>
+
+    <xacro:rplidar prefix="laser"/>
+    <!-- imu -->
+    <joint name="imu_joint" type="fixed">
+        <origin xyz="${imu_offset_x} ${imu_offset_y} ${imu_offset_z}" rpy="0 0 0" />
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+    </joint>
+    <xacro:lpms prefix="imu"/>
+
+</robot>

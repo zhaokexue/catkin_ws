@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="imu">
+
+	<xacro:macro name="lpms" params="prefix:=imu">
+		<link name="${prefix}_link">
+			<visual>
+				<origin xyz=" 0 0 0 " rpy="0 0 0" />
+				<geometry>
+					<box size="0.03 0.05 0.01"/>
+				</geometry>
+				<material name="black"/>
+			</visual>
+		</link>
+	</xacro:macro>
+
+</robot>
