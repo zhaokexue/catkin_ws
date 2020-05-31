@@ -1,7 +1,11 @@
 <launch>
 
     <!-- Run the map server -->
+<<<<<<< HEAD
     <node name="map_server" pkg="map_server" type="map_server" args="/home/kenan/map/map_gmapping_31.pgm 0.05"/>
+=======
+    <node name="map_server" pkg="map_server" type="map_server" args="/home/kenan/map/gmapping_map_21.pgm 0.05"/>
+>>>>>>> 204aba1c748b220080efcd29c3ea604adabe29d2
     <!-- 启动AMCL节点 -->
     <include file="$(find mbot_navigation)/launch/amcl.launch" />
 
